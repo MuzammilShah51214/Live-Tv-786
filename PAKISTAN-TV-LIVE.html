@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>❤️𝓢𝔂𝓮𝓭 𝓜𝓾𝔃𝓪𝓶𝓶𝓲𝓵 𝓢𝓱𝓪𝓱 ❤️</title>
+    <script type='text/javascript' src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000000;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #aaa;
+            padding-top: 200px; /* Space for fixed player */
+            padding-bottom: 30px; /* Space at bottom for better scrolling */
+        }
+
+        #player-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 210px;
+            background: #000;
+            z-index: 1000;
+        }
+
+        .channel-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            margin-top: 0;
+        }
+
+        .channel-button {
+            position: relative;
+            border-radius: 10%;
+            border: none;
+            padding: 2px;
+            height: 130px;
+            width: 96px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .channel-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                #ff0000, #ff7300, #fffb00, #48ff00,
+                #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000
+            );
+            background-size: 400% 400%;
+            opacity: 0;
+            transition: 0.5s;
+            animation: animateGlow 20s linear infinite;
+            z-index: 1;
+        }
+
+        .channel-button:hover::before {
+            opacity: 1;
+        }
+
+        .channel-button::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 8%;
+            background: #333;
+            z-index: 2;
+        }
+
+        .channel-button img {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 3;
+            transition: transform 0.3s ease;
+        }
+
+        .channel-button:hover img {
+            transform: scale(1.05);
+        }
+
+        @keyframes animateGlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 400% 50%;
+            }
+        }
+
+        .copyright {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        /* Pulse animation for the currently playing channel */
+        .playing {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+            }
+      
+}        
+    </style>
+</head>
+<body>
+    <!-- Player Container (fixed at top) -->
+    <div id="player-container"></div>
+
+    <!-- Channel Buttons -->
+    <div class="channel-buttons">
+    
+   <!-- All your channel buttons here -->
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/83M/chunks.m3u8', this)" class="channel-button">
+            <img src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/1707716722.webp?id=87"/>
+        </a>
+
+<a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/84M/chunks.m3u8', this)"class="channel-button">
+<img src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/poster/ary-digital-live-poster.webp?id=77"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/85M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/ary-zindagi-live-logo.webp?id=25"/></a>
+
+        <a onclick="changeChannel('http://125.209.88.166:45793/BRN/ArySports.stream/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzkAPsj5_azQWwEGkcrJbg5hD_xITmrOKhtQ&s"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/80M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/1707716909.webp?id=47"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/82M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/poster/HUM-TV-Poster.webp?id=20240917093633"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/157-4M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/poster/HUM-Sitaray-poster.webp?id=11"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/81M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/poster/HUM-Masala-Poster.webp?id=68"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/137M/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/geo-news-live.webp?id=84"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/122M/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/geo-entertainment-live.webp?id=75"/></a>
+
+        <a onclick="changeChannel('http://125.209.88.166:45793/BRN/GeoKahani.stream/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH_FjdifjHHeTxemukKsHpMjtd_5rsvq_K44AT14s80zEUk9Q46DPcFlA&s=10"/></a>
+
+        <a onclick="changeChannel('http://125.209.88.166:45793/BRN/GeoSuper.stream/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_4-_-9Dw7ONUQb-6ixGYneiSKHQIaW9bqGv-NpPUjG9YSc2rDUpqz_SI&s=10"/></a>
+
+        <a onclick="changeChannel('http://125.209.88.166:45793/BRN/GeoTez.stream/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoWt2wDZOzcgDXC-7qR7oKJkOEN27qhHA-zcTf2A3Vr3CclbSHbWLWJWQ&s=10"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/atv.smil/chunklist_w1308012764_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/d051f-atv.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/aplus.smil/chunklist_w1362335608_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/72534-a-plus-entertainment.jpg"/></a>
+
+        <a onclick="changeChannel('https://ptvstream1.nayatel.com:8096/transcoder/ptvhometrc_source/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://ptv.com.pk/frontend/media/gallery/ptvlivehome.jpg"/></a>
+
+        <a onclick="changeChannel('https://ptvstream1.nayatel.com:8096/transcoder/ptvglobaltrc_source/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://ptv.com.pk/frontend/media/gallery/ptvliveglobal.jpg"/></a>
+                
+     <a onclick="changeChannel('http://45.148.145.57/ptvS/tracks-v1a1/mono.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxftj7E-cjezduzYotuqzKjjLpQDE3HCY2LA&s"/></a>           
+                
+                
+                
+
+        <a onclick="changeChannel('https://ptvstream1.nayatel.com:8096/transcoder/ptvnewstrc_source/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://ptv.com.pk/frontend/media/gallery/ptvlivenews.jpg"/></a>
+        <a onclick="changeChannel('https://ptvstream1.nayatel.com:8096/transcoder/ptvworldtrc_source/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://ptv.com.pk/frontend/media/gallery/ptvliveworld.jpg"/></a>
+
+        <a onclick="changeChannel('https://s5.ideationtec.live/BOL_News_HD/BOL_News_HD.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/images/channels/new_thumbs/16419845781.jpg"/></a>
+        <a onclick="changeChannel('https://s2.ideationtec.live/BOL_Entertainment_HD/BOL_Entertainment_HD.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/images/channels/new_thumbs/16419858521.jpg"/></a>
+
+        <a onclick="changeChannel('https://s1.ideationtec.live/SAB_Entertainment/SAB_Entertainment.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSg0u8cjPgNmC0MJNpCfRq6SyIjKUpA72JO1IaaGMj7Dt5GnZ0iiDFLAs&s=10"/></a>
+
+        <a onclick="changeChannel('https://s1.ideationtec.live/SET_Ent/SET_Ent.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/1730720760949.webp?id=11"/></a>
+
+        <a onclick="changeChannel('https://s5.ideationtec.live/AAN_HD/AAN_HD.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/1681977574.webp?id=89"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/166M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/1702552123.webp?id=64"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/125M/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQanw2-oMc7F3BYzgK6FJZHmzExpMju3XpF0Q&usqp=CAU"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/playmax.smil/chunklist_w255016322_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/e0bf4-play-ent.jpg"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/159-1M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/poster/express-entertainment-live.webp?id=73"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/129M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Tvone-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/158-4M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/poster/urdu-1-live.webp?id=58"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/seetv.smil/chunklist_w1442420466_b1248000_slENG.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/d1e60-65d9a-see-tv-low.jpg"/></a>
+
+        <a onclick="changeChannel('http://124.109.47.101/hls/stream1.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="http://124.109.47.101/Logo_AUR_Life_Urdu_01.png"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/134M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Apna-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/131M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/8xm-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/135M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Jalwa-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/filmworld.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/b03ef-film-world.jpg"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/158-1M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAIbzFfvYLZ3dIpokqv6n7vmkvYPqti6d6MA72c-6zwMO7-jYWlPXoS44Q&s=10"/></a>
+
+        <a onclick="changeChannel('https://s2.ideationtec.live/Aruj_Ent/Aruj_Ent.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoJMdKWDCodNvnjUWWwJk-krlUsDhyqRo1gg&s"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/158-2M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/ltn-family-live.webp?id=87"/></a>
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/165M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/TMSH-1720441424490.webp?id=46"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/184M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/a1-tv-live.webp?id=18"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/tensports.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/poster/ten-sports-hd-poster.webp?id=76"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/92news.smil/chunklist_w495747136_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/3981a-65d9a-92-news-low.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/channel24.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/84a98-channel-24.jpg"/></a>
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/jaagtv.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/820ad-gnn-4.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/animal.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/996e5-animal-planet-4.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/discovery.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/d3023-4.jpg"/></a>
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/cartoon.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/70010-cartoon-network-in-urdu-4.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/discoverykids.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/85fdc-324-x-432.jpg"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/157-1M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/1702633459-logo.webp?id=57"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/saamanews.smil/chunklist_w1675076440_b1248000_slENG.m3u8', this)"class="channel-button">
+        
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/images/channels/new_thumbs/1633512222056d2-65d9a-saama-tv-low.jpg"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/113M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZXfD8mXuhzYNORwhKe9bZ8Yr-Vi5mbSnTsqc9PAMr3gNZIrM58bbyTFxM&s=10"/></a>
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/143M/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtxzNoKL_ICFzKxD8mLjEnQjipQR9zoyVTAURHQ8Ir1k0blQEPs2BszZ2B&s=10"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/city42.smil/chunklist_w1972668194_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/e8458-city-42.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/dhartitv.smil/chunklist_w1746647874_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/5eb9a-dharti-tv.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/awaztv.smil/chunklist_w1217689583_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/d0b57-awaz-tv.jpg"/></a>
+
+        <a onclick="changeChannel('https://s4.ideationtec.live/Public_News_HD/Public_News_HD.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Public_News_logo.jpg/640px-Public_News_logo.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/k2.smil/chunklist_w664054550_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/2ae68-kay-2.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/k21.smil/playlist.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/7d071-k21-news.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/kohenoor.smil/chunklist_w1226583800_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/0a7b4-kohenoor.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/khyber.smil/chunklist_w1256540169_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/9e716-khyber-entertainment.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/khybernews.smil/chunklist_w1728985823_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/9b2c5-khyber-new.jpg"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/121H/chunks.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Madni-TV-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/makkah.smil/chunklist_w669731795_b748000_slENG.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/images/channels/new_thumbs/1649059727Artboard5-100.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/madina.smil/chunklist_w2057112905_b748000_slEng.m3u8', this)"class="channel-button">
+
+<img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/images/channels/new_thumbs/1649059915Artboard5-100.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/metro.smil/chunklist_w1592291775_b748000_slEng.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/b736c-metro-one.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/mehran.smil/chunklist_w610434004_b748000_slEng.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/06b64-mehran-tv.jpg"/></a>
+
+        <a onclick="changeChannel('https://s5.ideationtec.live/Neo_News/Neo_News.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/b8f1b-neo-news.jpg"/></a>
+
+        <a onclick="changeChannel('https://tapmadlive.akamaized.net/tapmadold/vsh.smil/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://d34080pnh6e62j.cloudfront.net/adminpanel/assets/uploads/NewChannelThumbnailPath/61c18-vsh-news.jpg"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/136-1M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/sindh-tv-live.webp?id=40"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/136-2M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/sindh-tv-news-live.webp?id=59"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/183M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/poster/such-tv-live.webp?id=83"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/159-4M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/TMSH-1723464324782.webp?id=74"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/176M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/movie-one-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/177M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/champion-tv-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/133M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Abb-Takk-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/161M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/abn-news-live-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/179M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Lahore-Rang-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/172M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/times_news-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/brlivetransmit/live/brtransmit_480/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Binoria-Media.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/150M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Kashish-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/151M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/KTN-news-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/149M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/KTN-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/114M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Khaber-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/119M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Pashto1-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/140M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Afghan-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/130M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://images.mjunoon.tv:8181/logo/Waseb-mjunoon.webp"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/124M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxy0nP3owN22Aoh8_xdlp_nVbIPXAdtHGxjA&s"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/128M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/news-one-live.webp?id=96"/></a>
+
+        <a onclick="changeChannel('https://cdn5.mjunoon.tv:8087/streamtest/132M/playlist.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/discover-pakistan-live-logo.webp?id=27"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/139M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/roze-news-live.webp?id=70"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/147M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/rohi-live.webp?id=17"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/152M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://upload.wikimedia.org/wikipedia/en/d/d2/Dawn_News.jpg"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/155M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/logo/express-news-live.webp?id=49"/></a>
+
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/169M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/AIKNEWS-LOGO.webp?id=65"/></a>
+        <a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/186M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/gtv-new-logo.webp?id=34"/></a>
+
+        <a onclick="changeChannel('https://cdn.bmstudiopk.com/sunotv/live/chunklist_w2132309328.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://canvas.tamashaweb.com/jazzlive/uploads/channels/1709545345-logo.webp?id=30"/></a>
+
+        
+<a onclick="changeChannel('https://cdn4.mjunoon.tv:8087/streamtest/111M/chunks.m3u8', this)"class="channel-button"><img id="imageField" class="Button border" name="imageField"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Wqxi3XfF5NV_FMKA7ZAbyYAySTdBFOxIGix7eGoYGwjiLuzYJqer4Gs&s=10"/></a>
+    </div>
+
+
+
+
+    
+
+
+
+
+
+
+
+    <!-- Copyright -->
+    <div class="copyright">
+        <span>Copyright 2025. All Right Reserved By: ~Syed Muzammil Shah~</span>
+    </div>
+
+    <script>
+        // Initialize player
+        var player = new Clappr.Player({
+            source: "https://cdn4.mjunoon.tv:8087/streamtest/83M/chunks.m3u8",
+            poster: "https://i.ibb.co/3NgJ4zh/Poster.jpg",
+            parentId: "#player-container",
+            width: '100%',
+            height: '100%',
+            autoPlay: true,
+            mute: false,
+            mediacontrol: {seekbar: "#E113D3", buttons: "#66B2FF"}
+        });
+
+        // Track currently playing channel
+        let currentPlayingButton = null;
+        
+        function changeChannel(sourceUrl, button) {
+            player.load(sourceUrl);
+            player.play();
+            
+            // Remove playing class from previous button
+            if (currentPlayingButton) {
+                currentPlayingButton.classList.remove('playing');
+            }
+            
+            // Add playing class to current button
+            button.classList.add('playing');
+            currentPlayingButton = button;
+        }
+    </script>
+</body>
+</html>
