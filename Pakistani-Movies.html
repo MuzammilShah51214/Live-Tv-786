@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pakistani Movies Player</title>
+    <style>
+        :root {
+            --primary-color: #F653A6;
+            --secondary-color: #1a1a1a;
+            --text-color: #ffffff;
+            --hover-color: #ff7eb9;
+            --progress-color: #F653A6;
+            --control-bg: rgba(0, 0, 0, 0.7);
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: var(--text-color);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding-top: 220px;
+            padding-bottom: 70px;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(0,0,0,0.9);
+            padding: 10px 0;
+            text-align: center;
+            border-bottom: 1px solid var(--primary-color);
+            height: 40px;
+            backdrop-filter: blur(5px);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 28px;
+            line-height: 40px;
+            font-weight: 600;
+            text-shadow: 0 0 5px rgba(246, 83, 166, 0.5);
+        }
+        
+        #iframe-container, #dailymotion-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30vh;
+            background: #000;
+            z-index: 1002;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        #content-iframe, #dailymotion-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        #youtube-player, #dailymotion-player {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        
+        .iframe-close-btn, .jwplayer-close-btn, .dailymotion-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 1003;
+            transition: all 0.2s;
+        }
+        
+        .iframe-close-btn:hover, .jwplayer-close-btn:hover, .dailymotion-close-btn:hover {
+            background: var(--hover-color);
+            transform: scale(1.1);
+        }
+        
+        #player-container {
+            position: fixed;
+            top: 0px;
+            left: 0;
+            right: 0;
+            height: 40vh;
+            z-index: 1001;
+            display: none;
+        }
+        
+        #player {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .content {
+            margin-top: 40px;
+            padding: 20px;
+        }
+        
+        .stream-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Consistent styles for all image buttons */
+        .stream-option, .iframe-option {
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            width: 110px;
+            margin: 5px;
+        }
+        
+        .stream-option img, .iframe-option img {
+            width: 100px;
+            height: 140px;
+            border-radius: 15px;
+            object-fit: cover;
+            border: 2.5px solid var(--primary-color);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .stream-option:hover img, .iframe-option:hover img {
+            border-color: var(--text-color);
+            box-shadow: 0 0 15px rgba(246, 83, 166, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .stream-option p, .iframe-option p {
+            margin: 8px 0 0;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px;
+            color: var(--text-color);
+        }
+        
+        .jw-logo, .jw-rightclick {
+            display: none !important;
+        }
+        
+        .player-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.9);
+            z-index: 1001;
+            border-top: 1px solid var(--primary-color);
+            backdrop-filter: blur(5px);
+        }
+        
+        .img-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .img-btn img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            padding: 5px;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .img-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .img-btn:hover img {
+            border-color: var(--text-color);
+            box-shadow: 0 0 10px rgba(246, 83, 166, 0.8);
+        }
+        
+        .iframe-options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0px;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            text-align: center;
+            margin: 10px 0;
+            font-size: 10px;
+            font-weight: 400;
+            text-shadow: 0 0 5px rgba(246, 83, 166, 0.3);
+        }
+        
+        /* Iframe controls */
+        .iframe-controls-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--control-bg);
+            padding: 10px 0;
+            z-index: 1004;
+            opacity: 0;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Top controls container */
+        .iframe-top-controls-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--control-bg);
+            padding: 25px 0;
+            z-index: 1004;
+            opacity: 0;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        
+        #iframe-container:hover .iframe-controls-container,
+        #iframe-container:hover .iframe-top-controls-container,
+        #dailymotion-container:hover .iframe-controls-container,
+        #dailymotion-container:hover .iframe-top-controls-container {
+            opacity: 1;
+        }
+        
+        .iframe-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .iframe-control-btn {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid var(--primary-color);
+            color: var(--text-color);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .iframe-control-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        /* Progress bar container */
+        .progress-container {
+            position: fixed;
+            top: 205px;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: rgba(255,255,255,0.2);
+            z-index: 1004;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--progress-color);
+            width: 0%;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .progress-container:hover .progress-bar {
+            height: 8px;
+        }
+        
+        .progress-container:hover .progress-bar::after {
+            opacity: 1;
+        }
+        
+        .time-display {
+            position: absolute;
+            bottom: 30px;
+            left: 10px;
+            color: var(--text-color);
+            font-size: 12px;
+            z-index: 1004;
+            display: none;
+        }
+        
+        .duration-display {
+            position: absolute;
+            bottom: 30px;
+            right: 10px;
+            color: var(--text-color);
+            font-size: 12px;
+            z-index: 1004;
+            display: none;
+        }
+        
+        /* Seek feedback */
+        .seek-feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1005;
+            font-size: 24px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .stream-option, .iframe-option {
+                width: 100px;
+            }
+            
+            .stream-option img, .iframe-option img {
+                width: 90px;
+                height: 126px;
+            }
+            
+            .img-btn img {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .section-title {
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stream-option, .iframe-option {
+                width: 80px;
+            }
+            
+            .stream-option img, .iframe-option img {
+                width: 103px;
+                height: 140px;
+            }
+            
+            .img-btn img {
+                width: 35px;
+                height: 35px;
+            } 
+            
+            .player-controls {
+                gap: 5px;
+            }
+            
+            .stream-option p, .iframe-option p {
+                font-size: 10px;
+            }
+        }
+    </style>
+    <link rel="icon" href="https://cdn.stmify.com/wp-content/themes/cdnstmify/img/cdnStmify-icon.png" type="image/png">
+    <script src="//content.jwplatform.com/libraries/SAHhwvZq.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Pakistani Movies</h1>
+    </div>
+
+    <!-- Iframe Container -->
+    <div id="iframe-container">
+        <div class="spinner" id="spinner"></div>
+        <div class="error-message" id="error-message"></div>
+        
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="time-display" id="time-display">00:00</div>
+        <div class="duration-display" id="duration-display">00:00</div>
+        
+        <!-- Top controls container -->
+        <div class="iframe-top-controls-container">
+            <div class="iframe-controls">
+                <button class="iframe-close-btn" onclick="closeIframe()">×</button>   
+            </div>
+        </div>     
+        
+        <div class="iframe-controls-container">
+            <div class="iframe-controls">
+                <button class="iframe-control-btn" onclick="iframeTogglePlayPause()">⏯</button>
+                <button class="iframe-control-btn" onclick="seekBackward()">⏪ 15s</button>
+                <button class="iframe-control-btn" onclick="seekForward()">⏩ 15s</button>
+                <button class="iframe-control-btn" onclick="iframeToggleMute()">🔇</button>
+                <button class="iframe-control-btn" onclick="iframeToggleFullscreen()">⛶</button>
+            </div>
+        </div>
+        <iframe id="content-iframe" allowfullscreen allow="autoplay"></iframe>
+        <div id="youtube-player"></div>
+    </div>
+
+    <!-- Dailymotion Container -->
+    <div id="dailymotion-container">
+        <div class="spinner" id="dailymotion-spinner"></div>
+        <div class="error-message" id="dailymotion-error"></div>
+        
+        <div class="progress-container" id="dailymotion-progress-container">
+            <div class="progress-bar" id="dailymotion-progress-bar"></div>
+        </div>
+        <div class="time-display" id="dailymotion-time-display">00:00</div>
+        <div class="duration-display" id="dailymotion-duration-display">00:00</div>
+        
+        <!-- Top controls container -->
+        <div class="iframe-top-controls-container">
+            <div class="iframe-controls">
+                <button class="dailymotion-close-btn" onclick="closeDailymotion()">×</button>   
+            </div>
+        </div>     
+        
+        <iframe id="dailymotion-iframe" allowfullscreen allow="autoplay"></iframe>
+        <div id="dailymotion-player"></div>
+    </div>
+
+    <!-- Main Player -->
+    <div id="player-container">
+        <button class="jwplayer-close-btn" onclick="closejwplayer()">×</button>
+        <div id="player"></div>
+    </div>
+    
+    <div class="channel-info" id="channel-info"></div>
+    
+    <!-- Content Area -->
+    <div class="content">
+        <div class="stream-options">
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/chhalawa-2019/movie/Chhalawa_2019.smil/index.m3u8', 'Chhalawa 2019')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiL9uoKxtqR2W69j2Hh3sxbyuifpmDZ-nUHoHEFGDhQxpsX1glgIA1uqA&s=10" alt="Chhalawa">
+                <p>Chhalawa 2019</p>
+            </div>
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/parey_hut_love-2019/movie/Parey_Hut_Love_update_04.smil/index.m3u8', 'Parey Hut Love')">
+                <img src="https://aryfilms.com/uploads/2021/04/Parey-Hut-Love-poster-360x618_c.jpg" alt="Parey Hut Love">
+                <p>Parey Hut Love</p>
+            </div>
+            
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/iTly0DrLHeU')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJUdctyZHlCDPUeoHHQqKJn7aErMfj7Md3GQ&s"><p>Punjaab nahi Jaunge</p></div> 
+            
+            
+            
+            <div class="stream-option" onclick="loadPlayer('https://1a-1791.com/video/fw/s8/2/y/P/p/c/yPpci.caa.mp4?u=0&b=0', 'London Nahi Jaunga')">
+                <img src="https://upload.wikimedia.org/wikipedia/en/6/64/London_Nahi_Jaunga.JPG">
+                <p>London Nahi Jaunga</p>
+            </div>
+            
+      <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/leech-2024/movie/Leech_Updated.smil/index.m3u8', 'Leech 2024')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbsBYetIRq3b4InIxLZTrioJW9LtskTuWZwK1n70CLOaBdqiStREb3fHQ0&s=10">
+                <p>Leech 2024</p>
+            </div>
+        
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/na_baligh_afraad-2024/movie/Na_Baligh_Afraad.smil/index.m3u8', 'Na Baligh Afraad')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQKg-tn5qqW0arMr13tVWcG7Q6lc6kKAxswoF3Odrnti8wl8OYk9ZgvVc&s=10">
+                <p>Na Baligh Afraad</p>
+            </div>
+        
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/hum_tum_aur_woo-2024/movie/Hum_Tum_Aur_Woo.smil/index.m3u8', 'Hum Tum Aur Woo')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPeHB73KYLrejrRWCUsiOYjhqDrS9djNO4RyK3MIwK-okF4rr83qhgF-OO&s=10">
+                <p>Hum Tum Aur Woo</p>
+            </div>
+        
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/pakistani/gunjal-2023/movie/Gunjal.smil/index.m3u8', 'Gunjal')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOEi8vAbZBbGzxDJjhhKbrhngxOVJyDPPtsmPWm3Yq2VdRprZxslGqp1Y&s=10"><p>Gunjal</p>
+            </div>
+                
+    <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/ramchand_pakistani-2023/movie/Ramchand_Pakistani.smil/index.m3u8', 'ramchand_pakistani')">
+                <img src="https://static.vidly.tv/image/movies/ramchand_pakistani-2023/movie/Ramchand_Pakistani_1280x720.jpg"><p>ramchand_pakistani</p>
+            </div>        
+         <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/madaari-2023/movie/Madaari.smil/index.m3u8', 'Madaari')">
+                <img src=" https://static.vidly.tv/image/movies/madaari-2023/movie/Madaari_1280x720.webp"><p>Madaari</p>
+            </div>     
+            
+          <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/daadal-2023/movie/Daadal.smil/index.m3u8', 'Daadal')">
+                <img src="https://static.vidly.tv/image/movies/daadal-2023/movie/Daadal_1280x720.webp "><p>Daadal</p>
+            </div>    
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/pakistani/quaid_e_azam_zindabad-2022/movie/Quaid_E_Azam_Zindabaad.smil/index.m3u8', 'Quaid-e-Azam Zindabad')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReKffm-__sD4RC2fyrDWRUh_M5kWOgWzuSJZ8-WxdD0QQwtn67X9dUE-dr&s=10"><p>Quaid-e-Azam Zindabad</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/chaudhary-2022/movie/Chaudhary.smil/index.m3u8', 'Chaudhry')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhnlrWqbUTQBfHBZyKIY-W3Vxe66IE8ANDLieGiFwFkveEso6_s-UkhGI&s=10 "><p>Chaudhry </p>
+            </div>  
+           <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/music/ghabrana_nahi_hai-2022/movie/Ghabrana_Nahi_Hai.smil/index.m3u8', 'ghabrana_nahi_hai')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSux2YgyVc48bvu9gMuxNI_aJCQMEOLJVeVX8IhUAPLVwCnQj6iO8Ny7YM&s=10"><p>ghabrana_nahi_hai</p>
+            </div>        
+         <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/parde_mein_rehne_do-2022/movie/Parde_Mein_Rehne_Do.smil/index.m3u8', 'Parde_Mein_Rehne_Do')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuM9lKzrnI1lwo8Rf4cw0mg0f2gFmS1CEd9c3lKclBKthJtBhbnXTrmwE&s=10"><p>Parde_Mein_Rehne_Do</p>
+            </div>     
+            
+          <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/dum_mastam-2022/movie/Dum_Mastam.smil/index.m3u8', 'dum_mastam')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3JaAefoekRBy5_5A6d959aTTuTrYFpEJICw&s"><p>dum_mastam</p>
+            </div>    
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/intezaar-2022/movie/Intezaar.smil/index.m3u8', 'intezaar')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwWTGXkzFvHMu8MvJWo81eGV2d6cOqBgKxLkQK60GqDeAV0ISdQo4hwkU&s=10"><p>intezaar</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/golgappo-2022/movie/GolGappo.smil/index.m3u8', 'golgappo')">
+                <img src="https://static.vidly.tv/image/movies/golgappo-2022/movie/GolGappo_1280x720.webp "><p>golgappo</p>
+            </div>  
+ 
+            
+            
+          <div class="stream-option" onclick="loadPlayer(' https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/music/khel_khel_mein-2021/movie/Khel_Khel_Mein.smil/index.m3u8', 'Khel_Khel_Mein.smil')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTY6MF5cmRKVivq561c9Gu5pUrChbY8QrhKUw&s"><p>Khel_Khel_Mein.smil</p>
+            </div>    
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movie/adiala-2021/movie/Adiala.smil/index.m3u8', 'adiala-2021')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbfuyXNeXS7PsBMxlKweSA5DbrnMGR9whdXyyGryE7dtHIfV0v9c4Rjcc&s=10 "><p>adiala-2021</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/lockdown_370-2023/movie/Lockdown_370.smil/index.m3u8', 'lockdown_370')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZlMNKxKZTz1VR44wvt7qNZTJue99EloselTU3nKIDD_Q4jhGQbSI2zCM&s=10"><p>Lockdown_370</p>
+            </div>  
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/doda-2022/movie/DODA_Part_01.smil/index.m3u8', 'name')">
+                <img src="https://static.vidly.tv/image/movies/doda-2022/movie/DODA_Part_01_1280x720.webp "><p>DODA_Part_01</p>
+            </div>        
+         <div class="stream-option" onclick="loadPlayer(' https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/doda-2022/movie/DODA_Part_02.smil/index.m3u8', 'name')">
+                <img src="https://static.vidly.tv/image/movies/doda-2022/movie/DODA_Part_02_1280x720.webp "><p>DODA_Part_02</p>
+            </div>     
+            
+          <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movie/love_terha_hai-2020/movie/Love_Terha_Hai.smil/index.m3u8', 'Love_Terha_Hai')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbTyjbodJJRmeleru9b6y4RBjrIH6Xu1L87xBkX8AfPyvcfGXEqWzWxMU&s=10 "><p>Love_Terha_Hai</p>
+            </div>    
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/tevar-2019/movie/Tevar.smil/index.m3u8', 'tevar')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKEu3ebTs-wyVJYTjQXMBeqEbbdRJU07AxmGqvr28T27A0O9azTj2UGRg&s=10"><p>tevar</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/baaji-2019/movie/Baaji.smil/index.m3u8', 'baaji-2019')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA9XUGgLZCYnAacACksQAi3OWIVPCWIp1rsg&s"><p>baaji-2019</p>
+            </div>  
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/kataksha-2019/movie/Kataksha.smil/index.m3u8', 'kataksha')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTW8bCeCWr2Ic7M9bfow2g5zYiEnpbpqUcHeepDWYxYu3aaU7KZIcgloZI&s=10 "><p>kataksha</p>
+            </div>        
+         <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/wrong_no_2-2019/movie/Wrong_No_2.smil/index.m3u8', 'Wrong_No_2')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReigHve4cYwM5BJTEpazLKGHqkwuOlP9-s6Q&s "><p>Wrong_No_2</p>
+            </div>     
+            
+          <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/sherdil-2019/movie/SherDil_Updated.smil/index.m3u8', 'SherDil')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTl2XnU8jWtfG657cKSe1WOLIw50dCYH6ZZVVRWSC4tu746IaVbtt-qF5E&s=10 "><p>SherDil</p>
+            </div>    
+          
+
+
+
+
+
+  
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/load_wedding-2018/movie/Load_Wedding_2018.smil/index.m3u8', 'Load_Wedding_2018')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNvz-P-3ivJ9CDEQcyFOyKsIs61C4MKrFyaFgDk7PDCOzxhTpnIfS55Ds&s=10"><p>Load_Wedding_2018</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/motorcycle_girl-2018/movie/Motorcycle_Girl.smil/index.m3u8', 'name')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNrAxhW4v7sTilNSE8R31jWp3AdOpm0KHW3Q&s"><p>Motorcycle_Girl</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/maan_jao_naa-2018/movie/Maan_Jao_Naa.smil/index.m3u8', 'maan_jao_naa')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwlhbcrdcWyd0ADJWBRHp41Rkvur2TBzVFNZs_ybEhyhpCWBIbmanJBe0&s=10"><p>maan_jao_naa</p>
+            </div>        
+         <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/geo_sar_utha_kay-2017/movie/Geo_Sar_Utha_Kay.smil/index.m3u8', 'Geo_Sar_Utha_Kay')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYElAOWX3SQwdglDgYuhh0y7zWEPLDD8TN0A&s"><p>Geo_Sar_Utha_Kay</p>
+            </div>     
+            
+          <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/na_maloom_afraad_2-2017/movie/Na_Maloom_Afraad_2.smil/index.m3u8', 'Na_Maloom_Afraad_2')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnjNEcXBbGRBrVa_2s5tILVuAzLuPh5RYMlkkqNmSh3CFGyEclsJ8bpw1f&s=10"><p>Na_Maloom_Afraad_2</p>
+            </div>    
+            
+                 <div class="iframe-option" onclick="loadDailymotion('https://geo.dailymotion.com/player.html?video=x558cx3', 'Popular Video 3')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiEN5rV6GZetHWjesRFyAnRjAbKhI93vHNyvUH8rUTxyEKVnisGm0Muq0&s=10" alt="Popular Video 3">
+                <p>Malik</p>
+            </div>
+            
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/balu_mahi-2017/movie/Balu_Mahi.smil/index.m3u8', 'balu_mahi')">
+                <img src="https://upload.wikimedia.org/wikipedia/en/9/95/BaluMahi.jpg"><p>balu_mahi</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/oye_kuch_kar_guzar-2016/movie/Oye_Kuch_Kar_Guzar.smil/index.m3u8', 'Oye_Kuch_Kar_Guzar')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFtKGljXjbLefxwIF5jdWSGpLv7_uG5Po_jw&s"><p>Oye_Kuch_Kar_Guzar</p>
+            </div>  
+            
+           <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/lahore_se_aagey-2016/movie/Lahore_Se_Aagey.smil/index.m3u8', 'Lahore_Se_Aagey')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQGSWZ3wNNPqCbDyh719v4CWi1aURalqeH_gqa9KxgQ8a9ECET5An70wE&s=10"><p>Lahore_Se_Aagey</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/actor_in_law-2016/movie/Actor_In_Law.smil/index.m3u8', 'actor_in_law')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQc6BDgXTbHEEu_YwoSksldCuowPASdMB1gyap0MUPuH1GWrr1TahQ2bHNz&s=10"><p>actor_in_law</p>
+            </div> 
+
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/revenge_of_the_worthless-2016/movie/Revenge_Of_The_Worthless.smil/index.m3u8', 'revenge_of_the_worthless')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRULPzqHJ9iA4oUc8aHO3ihldXTl5OTFmWvdQmKChTLcv00X9-zkiHnVG4&s=10"><p>revenge_of_the_worthless</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/sawal_700_crore_dollars_ka-2016/movie/Sawal_700_Crore_Dollars_Ka.smil/index.m3u8', 'Sawal_700_Crore_Dollars_Ka')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCVV0gMNhrlL7TH_9D-6XmqvVLLuFFUzMyUuPM8hc_7Ger8EDK7A_vQkF5&s=10"><p>Sawal_700_Crore_Dollars_Ka</p>
+            </div> 
+
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/bachaana-2016/movie/Bachaana_2016.smil/index.m3u8', 'bachaana')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScdYihLhPUpwvZlWC6fH58SsvCDpd1R8pYCH_DKdLiPnSPDot2j1lpuh8S&s=10"><p>bachaana</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/ho_mann_jahaan-2017/movie/Ho_Mann_Jahaan.smil/index.m3u8', 'Ho_Mann_Jahaan')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq-yl2kfSXRlEHRZov1xRdSUhgmfNs3fe19z235c3Xvd-Rm_chVaju1l0&s=10"><p>Ho_Mann_Jahaan</p>
+            </div> 
+
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/dekh_magar_pyar_se-2015/movie/Dekh_Magar_Pyar_Se.smil/index.m3u8', 'dekh_magar_pyar_se')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGCGwGDEweQV_ArmT07rUw3fx7VkjGxyTV7hmf7oxzHD4d0BUhU-4BZcw&s=10"><p>dekh_magar_pyar_se</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/shah-2015/movie/Shah.smil/index.m3u8', 'Shah')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREtjxcPT1N10cVkuTTwEJVz-5OXefx1uhQzAwR7jdFaUvG0GaLW7PhhbI&s=10 "><p>Shah</p>
+            </div> 
+
+
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/karachi_se_lahore-2015/movie/Karachi_Se_Lahore.smil/index.m3u8', 'Karachi_Se_Lahore')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiid_rWfAZV04OleQDa48br0WnrYXd_XrUPcQ1MQHHtkq7pGA0r6gAnXmJ&s=10"><p>Karachi_Se_Lahore</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/maya-2015/movie/Maya.smil/index.m3u8', 'maya')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtuMxbJb5Hr7XZYTxdWKz5-stLnFZagB3BZg&s "><p>maya</p>
+            </div>  
+            
+           <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/siyaah-2013/movie/Siyaah.smil/index.m3u8', 'siyaah')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr8RAAr_M7bQCNJ3c5bix62P4-Vtlfkb9Pf9EGhr1qe0Jseu_FxMJQibM&s=10 "><p>siyaah</p>
+            </div> 
+
+
+<div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/bxyMtR3h5xg', 'Ye Dil apka Hua')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyLXG4zXVJOqfxzRTi9jBzlsnbfo0OeGd8F82ox7zI_oLOlQ26WLCT2iA&s=10">
+                <p>Ye Dil apka Hua</p>
+            </div>
+            
+            <div class="iframe-option" onclick="loadDailymotion('https://geo.dailymotion.com/player.html?playlist=x71ls7', 'Koi tujhsa kahan')">
+                <img src="https://upload.wikimedia.org/wikipedia/en/a/a8/Koi_Tujh_Sa_Kahaan_CD_Cover.jpg" alt="Koi tujhsa kahan">
+                <p>Koi tujhsa kahan</p>
+            </div>     
+          <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/nykdL8K1JgA')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbiDL_AJFKyqpMqU2OeAc3qYByjXpVmz3AZa2onZ_DSDrbb1O6D6K8GjE&s=10">
+                <p>Love Mein Gum</p>
+            </div>   
+            
+            
+            
+            
+           <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/3KohEQI6iwo')">
+                <img src="https://upload.wikimedia.org/wikipedia/en/0/08/Tere-Pyaar-Main-Dvd-copy.jpg">
+                <p>TERE PYAR MAIN (2000)</p>
+            </div> 
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/6lCJkaOf6lw')">
+                <img src=" https://upload.wikimedia.org/wikipedia/en/e/ee/Ghar-Kab-Aayo-Gay-Dvd-copy.jpg">
+                <p>GHAR KAB AAO GAY</p>
+            </div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/lz-fVUNd8As')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDS58h6ERNF0-Hze6ASJm8n9NEonfq-VJlnMOBpmIGUwieZyF66YtkmYE&s=10 ">
+                <p>COMMANDO (2003)</p>
+            </div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/8rG40PwcClU')">
+                <img src="https://www.desimovies.biz/cdn/shop/files/small_3052f08a-a2fc-4d2e-976c-3834da2f42cc_large.jpg">
+                <p>Musalman</p>
+            </div> 
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/orwGr7dblbw')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSW6U7nE1iMoajzDJH1GmPoMOEKJelluzrNXGack8esFWjYXziCnKagBYY&s=10 "><p>Soldier</p></div> 
+            
+           <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/cg4W7Z72pig')">
+                <img src="https://www.desimovies.biz/cdn/shop/files/small-min_51fa0e52-d128-44cc-bc88-2d0821d7e99c_large.jpg"><p>Sholay</p></div>  
+            
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/tM2XPBLKmBY')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTImIbl5edKaLz3B9f8xl3FHNIPuA-Z6V-QbA&s">
+                <p>KHOYE HO TUM KAHAN</p>
+            </div> 
+            
+            
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/8BHn_m-MNQI')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3hMvJALrQuVKeblB_68rqgJlQdsT2pWfICA&s">
+                <p>Abhi Nahin To Kabhi Nain</p>
+            </div> 
+            
+            <div class="iframe-option" onclick="loadDailymotion('https://www.zengatv.com/embed?v=c95a9840-7de0-4de5-97d4-e1a3ed397929.html&t=movies', 'Popular Video 2')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCUPcZwGWAUmi4KqnOE4cWnQoJwJx4FM9xKw&usqp=CAU">
+                <p>Mujhy Chand Chahiye</p>
+            </div>
+            
+<div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/kVJKsZHXdKc')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXabTPnlUjSOsHDi2UzP-eopDMcsY82mmGNQ&s "><p>SALAKHAIN</p></div> 
+
+
+<div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/7Q42bQs2uOw')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLXwQSGO5s-YW32m9KFIv-EP_Z2el0XllLVmQH1BdBfAMokhSyEzX4LK52&s=10"><p>Mere Mehboob 2001</p></div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/hrjIPoEoB-c')">
+                <img src=" https://www.desimovies.biz/cdn/shop/products/kun_bany_ga_karorpati_copy_large.jpg?v=1489487291"><p>Kun Bany Ga Carorpati</p></div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/ykIcNqV5VEU')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRST8jEQOy9tnAxUakNGMp_jeRI7wJI3xSbcX7Olc5hqrz3Pwuoc5veRo&s=10 "><p>Jaan Tere Naam</p></div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/vCsVVYAD_9U')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRrr-raOFJuM1hZ3DqWSb2-SbbRYaIc5JwgHDIM3RpuCV9kQJs_dL1ZHM&s=10 "><p>Janwar</p></div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/BK06jQl6C9A')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRRgNIA5xV9AB2y-ceygLfRJidzBQ-3VVFCQ&s"><p>Ishq e Khuda</p></div> 
+                
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/wmr2E61nVIE')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoQ6sr0QHw-AsAn3JgR0illEDo5WFEdK3pUxxL4602PH4U1F2e-m9yDxsy&s=10"><p>Sangam</p></div> 
+                
+  <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/BU49pUySNV8', 'choriyaan')">
+                <img src="https://upload.wikimedia.org/wikipedia/en/d/dc/Choorian_(1998_film).jpg">
+                <p>choriyaan</p>
+            </div>        
+
+<div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/916OdvhlkWc')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0uQHc2R0hCt7EafSpYDo94z7sIa-72bCJ-TaSwfN21dIxe53TXd6vGZLc&s=10"><p>KhudaKayLiye</p></div> 
+            
+            
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/b2Oi8JslQeI')">
+                <img src="https://www.desimovies.biz/cdn/shop/products/BookletCoverScan600pxl_2f5936cf-27be-43bd-bce4-34eb13a1ff40_large.jpg"><p>Dil Deewana Hai</p></div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/Cb2Oqu_yd6M')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrc4l98gouIW8uXuYHGFlA8cckgJ-c4J4hbsZtFZOUAyBdo2ddXtGtEEI&s=10 "><p>Dunya Dekhy Gi</p></div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/W_LU--OIMF0')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvIuFH39HmKrS0sF5gy2DAXKh9fCGhLC95WQ&s"><p>Tera Jado Chal Gaya</p></div> 
+            
+            <div class="iframe-option" onclick="loadIframe('https://www.youtube.com/embed/xhwV0GBTZ4c')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvR6GVnw4GFCUuxRzzQ4OZkDSo3a6u1pOquXjDzj01rkBhuiu6Z4seAIQk&s=10 "><p>Hum Tumhare Hain</p></div> 
+
+ 
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/tu_jo_mila-2022/movie/Tu_Jo_Mila.smil/index.m3u8', 'tu_jo_mila')">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-NEYUDCkmwOLF2ThnMN3lcSJ51X5Ntqwsm2q2675C-aRmp7vqYBHdIpw&s=10 "><p>tu_jo_mila</p>
+            </div> 
+
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/jaana-2022/movie/Jaana.smil/index.m3u8', 'jaana')">
+                <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRePS685KIPKnlObd4AyH9SUjKXcI3-1ZoC2yATInCG-djB0ddJpKkMe5zm&s=10"><p>jaana</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/dil_hai_tera_deewana-2022/movie/Dil_Hai_Tera_Deewana.smil/index.m3u8', 'Dil_Hai_Tera_Deewana')">
+                <img src="https://static.vidly.tv/image/movies/dil_hai_tera_deewana-2022/movie/Dil_Hai_Tera_Deewana_1280x720.jpg"><p>Dil_Hai_Tera_Deewana</p>
+            </div> 
+
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/umeed-2022/movie/Umeed.smil/index.m3u8', 'umeed')">
+                <img src="https://static.vidly.tv/image/movies/umeed-2022/movie/Umeed_1280x720.webp "><p>umeed</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/baseera-2022/movie/Baseera.smil/index.m3u8', 'baseera')">
+                <img src="https://static.vidly.tv/image/movies/baseera-2022/movie/Baseera_1280x720.webp"><p>Baseera</p>
+            </div> 
+
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/andaaz-2022/movie/Andaaz.smil/index.m3u8', 'andaaz')">
+                <img src="https://static.vidly.tv/image/movies/andaaz-2022/movie/Andaaz_1280x720.webp "><p>Andaaz</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/tu_mera_nahi-2022/movie/Tu_Mera_Nahi.smil/index.m3u8', 'tu_mera_nahi')">
+                <img src=" https://static.vidly.tv/image/movies/tu_mera_nahi-2022/movie/Tu_Mera_Nahi_1661850852908_1280x720.webp"><p>Tu Mera Nahi</p>
+            </div> 
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/tere_bina-2022/movie/Tere_Bina.smil/index.m3u8', 'tere_bina')">
+                <img src=" https://static.vidly.tv/image/movies/tere_bina-2022/movie/Tere_Bina_1280x720.webp"><p>Tere Bina</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/intezar-2022/movie/Intezar.smil/index.m3u8', 'intezar')">
+                <img src="https://static.vidly.tv/image/movies/intezar-2022/movie/Intezar_1280x720.webp "><p>Intezar</p>
+            </div> 
+
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/aashiqui-2022/movie/Aashiqui.smil/index.m3u8', 'aashiqui')">
+                <img src="https://static.vidly.tv/image/movies/aashiqui-2022/movie/Aashiqui_1280x720.webp"><p>Aashiqui</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/hawayein-2022/movie/Hawayein.smil/index.m3u8', 'hawayein')">
+                <img src=" https://static.vidly.tv/image/movies/hawayein-2022/movie/Hawayein_1280x720.webp"><p>Hawayein</p>
+            </div> 
+<div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/ijazat-2022/movie/Ijazat.smil/index.m3u8', 'ijazat')">
+                <img src="https://static.vidly.tv/image/movies/ijazat-2022/movie/Ijazat_1280x720.webp"><p>Ijazat</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/bas_ek_pal-2022/movie/Bas_Ek_Pal.smil/index.m3u8', 'bas_ek_pal')">
+                <img src=" https://static.vidly.tv/image/movies/bas_ek_pal-2022/movie/Bas_Ek_Pal_1280x720.webp"><p>Bas Ek Pal</p>
+            </div> 
+ 
+ 
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/inteqam-2023/movie/Inteqam.smil/index.m3u8', 'inteqam')">
+                <img src="https://static.vidly.tv/image/movies/inteqam-2023/movie/Inteqam_1280x720.webp "><p>inteqam</p>
+            </div> 
+ 
+ <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/raqs-2023/movie/Raqs.smil/index.m3u8', 'Raqs')">
+                <img src="https://static.vidly.tv/image/movies/raqs-2023/movie/Raqs_1280x720.webp"><p>Raqs</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/ek_dil_hai-2023/movie/Ek_Dil_Hai.smil/index.m3u8', 'ek_dil_hai')">
+                <img src="https://static.vidly.tv/image/movies/ek_dil_hai-2023/movie/Ek_Dil_Hai_1280x720.webp"><p>Ek Dil Hai</p>
+            </div> 
+ 
+ 
+ <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/nadaniyaan-2023/movie/Nadaniyaan.smil/index.m3u8', 'nadaniyaan')">
+                <img src="https://static.vidly.tv/image/movies/nadaniyaan-2023/movie/Nadaniyaan_1280x720.webp"><p>nadaniyaan</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/tera_pyaar_hai_kaisa-2023/movie/Tera_Pyaar_Hai_Kaisa.smil/index.m3u8', 'Tera_Pyaar_Hai_Kaisa')">
+                <img src="https://static.vidly.tv/image/movies/tera_pyaar_hai_kaisa-2023/movie/Tera_Pyaar_Hai_Kaisa_1280x720.webp"><p>Tera_Pyaar_Hai_Kaisa</p>
+            </div> 
+ 
+ <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/tum_mile-2023/movie/Tum_Mile.smil/index.m3u8', 'tum_mile')">
+                <img src=" https://static.vidly.tv/image/movies/tum_mile-2023/movie/Tum_Mile_1280x720.webp"><p>tum_mile</p>
+            </div>  
+            
+            <div class="stream-option" onclick="loadPlayer('https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/movies/jinnah-1998/movie/Jinnah_Export_Urdu.smil/index.m3u8', 'jinnah')">
+                <img src="https://static.vidly.tv/image/pakistani/jinnah/movie/jinnah_urdu_1_1280x720.webp "><p>jinnah (Urdu)</p>
+            </div>      
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+   
+
+
+
+
+
+
+
+
+             
+            
+            
+            
+            
+            
+            
+                  
+                
+                
+                
+            
+            
+         
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+       
+        </div>
+    </div>
+
+    <!-- Seek Feedback Element -->
+    <div class="seek-feedback" id="seek-feedback"></div>
+
+    <script>
+        // Channel list with URLs and names
+        const channels = [
+            { url: 'https://d1jfc1x2reg057.cloudfront.net/titan/_definst_/vidly_vod/content/smil:video/pakistani/parey_hut_love-2019/movie/Parey_Hut_Love_update_04.smil/index.m3u8', name: 'Parey Hut Love' },
+            { url: 'https://d14c63magvk61v.cloudfront.net/strm/channels/9xm/master.m3u8', name: '9XM' },
+            { url: 'https://d14c63magvk61v.cloudfront.net/strm/channels/9xjalwa/master.m3u8', name: '9X Jalwa' },
+            { url: 'https://d2q8p4pe5spbak.cloudfront.net/bpk-tv/9XJalwa/playlist.m3u8', name: '9X Jalwa HD' },
+            { url: 'https://d2q8p4pe5spbak.cloudfront.net/bpk-tv/9XM/playlist.m3u8', name: '9XM HD' }
+        ];
+        
+        // Seek times in seconds
+        const SEEK_FORWARD_TIME = 15;
+        const SEEK_BACKWARD_TIME = 15;
+        
+        let currentChannelIndex = 0;
+        let isPlaying = true;
+        let isMuted = false;
+        let youtubePlayer = null;
+        let isIframePlaying = true;
+        let isIframeMuted = false;
+        let progressInterval = null;
+        let currentIframeUrl = '';
+        let currentIframeTitle = '';
+        let isDailymotionPlaying = true;
+        let isDailymotionMuted = false;
+        let dailymotionProgressInterval = null;
+        let currentDailymotionUrl = '';
+        let currentDailymotionTitle = '';
+        let activePlayer = null; // 'jwplayer', 'youtube', 'dailymotion'
+        
+        // Initialize JW Player
+        const player = jwplayer("player").setup({
+            file: channels[currentChannelIndex].url,
+            width: "100%",
+            height: "100%",
+            image: "https://i.pinimg.com/736x/19/c1/f3/19c1f37b850e2b20b3758e71ac9c3793.jpg",
+            stretching: "uniform",
+            
+            logo: {
+                hide: true
+            },
+            abouttext: "Pakistani Movies Player",
+            aboutlink: "https://example.com"
+        });
+        
+        // Update channel info display
+        function updateChannelInfo() {
+            const channelInfo = document.getElementById('channel-info');
+            channelInfo.textContent = `Now Playing: ${channels[currentChannelIndex].name}`;
+            channelInfo.style.display = 'block';
+        }
+        
+        // Function to load different streams
+        function loadPlayer(streamUrl, channelName) {
+            // Close other players first
+            closeIframe();
+            closeDailymotion();
+            
+            // Properly stop JW Player if it's playing
+            if (player.getState() === 'playing') {
+                player.stop();
+            }
+            
+            // Show the main player container
+            const playerContainer = document.getElementById('player-container');
+            playerContainer.style.display = 'block';
+            
+            // Make sure the close button is on top
+            playerContainer.querySelector('.jwplayer-close-btn').style.zIndex = '1003';
+            
+            showLoading(false); // Hide any loading spinner
+            hideError(); // Hide any error message
+            
+            currentChannelIndex = channels.findIndex(ch => ch.url === streamUrl);
+            if (currentChannelIndex === -1) {
+                // If not in channel list, add it temporarily
+                channels.push({ url: streamUrl, name: channelName });
+                currentChannelIndex = channels.length - 1;
+            }
+            
+            player.load([{ file: streamUrl }]);
+            player.play();
+            isPlaying = true;
+            activePlayer = 'jwplayer';
+            document.getElementById('channel-info').textContent = `Now Playing: ${channelName}`;
+            
+            // Update play button icon
+            document.querySelector('.player-controls .img-btn:nth-child(2) img').src = 'https://cdn-icons-png.flaticon.com/512/2088/2088576.png';
+        }
+        
+        // Close JWPlayer
+        function closejwplayer() {
+            document.getElementById('player-container').style.display = 'none';
+            player.stop();
+            activePlayer = null;
+        }
+        
+        // Toggle play/pause
+        function togglePlayPause() {
+            if (activePlayer === 'jwplayer') {
+                if (player.getState() === 'playing') {
+                    player.pause();
+                    document.querySelector('.player-controls .img-btn:nth-child(2) img').src = 'https://cdn-icons-png.flaticon.com/512/2088/2088562.png';
+                } else {
+                    player.play();
+                    document.querySelector('.player-controls .img-btn:nth-child(2) img').src = 'https://cdn-icons-png.flaticon.com/512/2088/2088576.png';
+                }
+            } else if (activePlayer === 'youtube' && youtubePlayer) {
+                iframeTogglePlayPause();
+            } else if (activePlayer === 'dailymotion') {
+                dailymotionTogglePlayPause();
+            }
+        }
+        
+        // Next channel
+        function nextChannel() {
+            if (activePlayer !== 'jwplayer') return;
+            
+            currentChannelIndex = (currentChannelIndex + 1) % channels.length;
+            player.load([{ file: channels[currentChannelIndex].url }]);
+            player.play();
+            isPlaying = true;
+            updateChannelInfo();
+        }
+        
+        // Previous channel
+        function previousChannel() {
+            if (activePlayer !== 'jwplayer') return;
+            
+            currentChannelIndex = (currentChannelIndex - 1 + channels.length) % channels.length;
+            player.load([{ file: channels[currentChannelIndex].url }]);
+            player.play();
+            isPlaying = true;
+            updateChannelInfo();
+        }
+        
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (activePlayer === 'jwplayer') {
+                if (player.getFullscreen()) {
+                    player.setFullscreen(false);
+                } else {
+                    player.setFullscreen(true);
+                }
+            } else if (activePlayer === 'youtube') {
+                iframeToggleFullscreen();
+            } else if (activePlayer === 'dailymotion') {
+                dailymotionToggleFullscreen();
+            }
+        }
+        
+        // Format time (seconds to MM:SS)
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update progress bar for YouTube
+        function updateYouTubeProgress() {
+            if (youtubePlayer && youtubePlayer.getCurrentTime && youtubePlayer.getDuration) {
+                try {
+                    const currentTime = youtubePlayer.getCurrentTime();
+                    const duration = youtubePlayer.getDuration();
+                    const progressPercent = (currentTime / duration) * 100;
+                    
+                    document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+                    document.getElementById('time-display').textContent = formatTime(currentTime);
+                    document.getElementById('duration-display').textContent = formatTime(duration);
+                } catch (e) {
+                    console.error("Error updating YouTube progress:", e);
+                }
+            }
+        }
+        
+        // Handle progress bar click
+        function handleProgressBarClick(e) {
+            const progressContainer = document.getElementById('progress-container');
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            
+            if (youtubePlayer) {
+                // Seek YouTube video
+                try {
+                    youtubePlayer.seekTo(youtubePlayer.getDuration() * pos, true);
+                } catch (e) {
+                    console.error("Error seeking YouTube video:", e);
+                }
+            }
+        }
+        
+        // Handle Dailymotion progress bar click
+        function handleDailymotionProgressBarClick(e) {
+            const progressContainer = document.getElementById('dailymotion-progress-container');
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            
+            // For Dailymotion iframe, we can't control seeking directly
+            // This would need to be implemented with Dailymotion API if needed
+            alert("Seeking control not available for Dailymotion content");
+        }
+        
+        // Setup progress bar click event
+        function setupProgressBarClick() {
+            const progressContainer = document.getElementById('progress-container');
+            progressContainer.removeEventListener('click', handleProgressBarClick);
+            progressContainer.addEventListener('click', handleProgressBarClick);
+        }
+        
+        // Setup Dailymotion progress bar click event
+        function setupDailymotionProgressBarClick() {
+            const progressContainer = document.getElementById('dailymotion-progress-container');
+            progressContainer.removeEventListener('click', handleDailymotionProgressBarClick);
+            progressContainer.addEventListener('click', handleDailymotionProgressBarClick);
+        }
+        
+        // Start progress tracking
+        function startProgressTracking() {
+            // Clear any existing interval
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            
+            // Show progress elements
+            document.getElementById('progress-container').style.display = 'block';
+            document.getElementById('time-display').style.display = 'block';
+            document.getElementById('duration-display').style.display = 'block';
+            
+            // Set up new interval
+            progressInterval = setInterval(() => {
+                if (currentIframeUrl.includes('youtube.com') || currentIframeUrl.includes('youtu.be')) {
+                    updateYouTubeProgress();
+                }
+            }, 1000);
+        }
+        
+        // Start Dailymotion progress tracking
+        function startDailymotionProgressTracking() {
+            // Clear any existing interval
+            if (dailymotionProgressInterval) {
+                clearInterval(dailymotionProgressInterval);
+            }
+            
+            // Show progress elements
+            document.getElementById('dailymotion-progress-container').style.display = 'block';
+            document.getElementById('dailymotion-time-display').style.display = 'block';
+            document.getElementById('dailymotion-duration-display').style.display = 'block';
+            
+            // For Dailymotion, we can't track progress directly without API
+            // This is just a placeholder
+            dailymotionProgressInterval = setInterval(() => {
+                // Would need Dailymotion API to implement this
+            }, 1000);
+        }
+        
+        // Stop progress tracking
+        function stopProgressTracking() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+            
+            // Hide progress elements
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('time-display').style.display = 'none';
+            document.getElementById('duration-display').style.display = 'none';
+        }
+        
+        // Stop Dailymotion progress tracking
+        function stopDailymotionProgressTracking() {
+            if (dailymotionProgressInterval) {
+                clearInterval(dailymotionProgressInterval);
+                dailymotionProgressInterval = null;
+            }
+            
+            // Hide progress elements
+            document.getElementById('dailymotion-progress-container').style.display = 'none';
+            document.getElementById('dailymotion-time-display').style.display = 'none';
+            document.getElementById('dailymotion-duration-display').style.display = 'none';
+        }
+        
+        // Show loading spinner
+        function showLoading(isDailymotion = false) {
+            if (isDailymotion) {
+                document.getElementById('dailymotion-spinner').style.display = 'block';
+            } else {
+                document.getElementById('spinner').style.display = 'block';
+            }
+        }
+        
+        // Hide loading spinner
+        function hideLoading(isDailymotion = false) {
+            if (isDailymotion) {
+                document.getElementById('dailymotion-spinner').style.display = 'none';
+            } else {
+                document.getElementById('spinner').style.display = 'none';
+            }
+        }
+        
+        // Show error message
+        function showError(message, isDailymotion = false) {
+            if (isDailymotion) {
+                document.getElementById('dailymotion-error').textContent = message;
+                document.getElementById('dailymotion-error').style.display = 'block';
+            } else {
+                document.getElementById('error-message').textContent = message;
+                document.getElementById('error-message').style.display = 'block';
+            }
+        }
+        
+        // Hide error message
+        function hideError(isDailymotion = false) {
+            if (isDailymotion) {
+                document.getElementById('dailymotion-error').style.display = 'none';
+            } else {
+                document.getElementById('error-message').style.display = 'none';
+            }
+        }
+        
+        // Load iframe content
+        function loadIframe(url, title) {
+            // Close other players first
+            closejwplayer();
+            closeDailymotion();
+            
+            // Show iframe container
+            const iframeContainer = document.getElementById('iframe-container');
+            iframeContainer.style.display = 'block';
+            
+            // Make sure the close button is on top
+            iframeContainer.querySelector('.iframe-close-btn').style.zIndex = '1003';
+            
+            // Set title
+            document.getElementById('channel-info').textContent = `Now Playing: ${title}`;
+            document.getElementById('channel-info').style.display = 'block';
+            
+            currentIframeUrl = url;
+            currentIframeTitle = title;
+            activePlayer = 'youtube';
+            
+            // Check if it's a YouTube URL
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                // Hide regular iframe and show YouTube player div
+                document.getElementById('content-iframe').style.display = 'none';
+                document.getElementById('youtube-player').style.display = 'block';
+                
+                // Extract video ID from URL
+                let videoId = '';
+                if (url.includes('embed')) {
+                    videoId = url.split('/embed/')[1].split('?')[0];
+                } else if (url.includes('v=')) {
+                    videoId = url.split('v=')[1].split('&')[0];
+                } else if (url.includes('youtu.be/')) {
+                    videoId = url.split('youtu.be/')[1].split('?')[0];
+                }
+                
+                // Initialize YouTube player if not already created
+                if (!youtubePlayer) {
+                    youtubePlayer = new YT.Player('youtube-player', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: videoId,
+                        playerVars: {
+                            'autoplay': 1,
+                            'controls': 0,
+                            'disablekb': 1,
+                            'modestbranding': 1,
+                            'rel': 0
+                        },
+                        events: {
+                            'onReady': onYouTubePlayerReady,
+                            'onStateChange': onYouTubePlayerStateChange,
+                            'onError': onYouTubePlayerError
+                        }
+                    });
+                } else {
+                    // Load new video if player already exists
+                    youtubePlayer.loadVideoById(videoId);
+                }
+                
+                // Setup progress tracking
+                setupProgressBarClick();
+                startProgressTracking();
+            } else {
+                // For non-YouTube content, use regular iframe
+                document.getElementById('youtube-player').style.display = 'none';
+                document.getElementById('content-iframe').style.display = 'block';
+                document.getElementById('content-iframe').src = url;
+                
+                // Hide progress elements for non-YouTube content
+                stopProgressTracking();
+            }
+        }
+        
+        // Close iframe
+        function closeIframe() {
+            document.getElementById('iframe-container').style.display = 'none';
+            document.getElementById('content-iframe').src = '';
+            document.getElementById('channel-info').style.display = 'none';
+            
+            // Stop YouTube player if it exists
+            if (youtubePlayer) {
+                youtubePlayer.stopVideo();
+            }
+            
+            // Stop progress tracking
+            stopProgressTracking();
+            
+            activePlayer = null;
+        }
+        
+        // YouTube Player API callbacks
+        function onYouTubePlayerReady(event) {
+            hideLoading();
+            event.target.playVideo();
+            isIframePlaying = true;
+        }
+        
+        function onYouTubePlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isIframePlaying = true;
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isIframePlaying = false;
+            } else if (event.data === YT.PlayerState.ENDED) {
+                isIframePlaying = false;
+            }
+        }
+        
+        function onYouTubePlayerError(event) {
+            showError('Error loading YouTube video. Please try another one.');
+            hideLoading();
+        }
+        
+        // Iframe control functions
+        function iframeTogglePlayPause() {
+            if (currentIframeUrl.includes('youtube.com') || currentIframeUrl.includes('youtu.be')) {
+                if (isIframePlaying) {
+                    youtubePlayer.pauseVideo();
+                } else {
+                    youtubePlayer.playVideo();
+                }
+                isIframePlaying = !isIframePlaying;
+            }
+        }
+        
+        function iframeToggleMute() {
+    if (currentIframeUrl.includes('youtube.com') || currentIframeUrl.includes('youtu.be')) {
+        if (isIframeMuted) {
+            youtubePlayer.unMute();
+        } else {
+            youtubePlayer.mute();
+        }
+        isIframeMuted = !isIframeMuted;
+    }
+}
+
+function iframeToggleFullscreen() {
+    const iframeContainer = document.getElementById('iframe-container');
+    if (!document.fullscreenElement) {
+        iframeContainer.requestFullscreen().catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function seekForward() {
+    if (currentIframeUrl.includes('youtube.com') || currentIframeUrl.includes('youtu.be')) {
+        try {
+            const currentTime = youtubePlayer.getCurrentTime();
+            youtubePlayer.seekTo(currentTime + SEEK_FORWARD_TIME, true);
+            showSeekFeedback(SEEK_FORWARD_TIME);
+        } catch (e) {
+            console.error("Error seeking forward:", e);
+        }
+    }
+}
+
+function seekBackward() {
+    if (currentIframeUrl.includes('youtube.com') || currentIframeUrl.includes('youtu.be')) {
+        try {
+            const currentTime = youtubePlayer.getCurrentTime();
+            const newTime = Math.max(0, currentTime - SEEK_BACKWARD_TIME);
+            youtubePlayer.seekTo(newTime, true);
+            showSeekFeedback(-SEEK_BACKWARD_TIME);
+        } catch (e) {
+            console.error("Error seeking backward:", e);
+        }
+    }
+}
+
+function showSeekFeedback(seconds) {
+    const feedback = document.getElementById('seek-feedback');
+    feedback.textContent = seconds > 0 ? `+${seconds}s` : `${seconds}s`;
+    feedback.style.opacity = '1';
+    
+    setTimeout(() => {
+        feedback.style.opacity = '0';
+    }, 1000);
+}
+
+// Dailymotion Player Functions
+function loadDailymotion(url, title) {
+    // Close other players first
+    closejwplayer();
+    closeIframe();
+    
+    // Show Dailymotion container
+    const dmContainer = document.getElementById('dailymotion-container');
+    dmContainer.style.display = 'block';
+    
+    // Make sure the close button is on top
+    dmContainer.querySelector('.dailymotion-close-btn').style.zIndex = '1003';
+    
+    // Set title
+    document.getElementById('channel-info').textContent = `Now Playing: ${title}`;
+    document.getElementById('channel-info').style.display = 'block';
+    
+    currentDailymotionUrl = url;
+    currentDailymotionTitle = title;
+    activePlayer = 'dailymotion';
+    
+    // Load Dailymotion iframe
+    document.getElementById('dailymotion-iframe').src = url;
+    
+    // Setup progress tracking
+    setupDailymotionProgressBarClick();
+    startDailymotionProgressTracking();
+}
+
+function closeDailymotion() {
+    document.getElementById('dailymotion-container').style.display = 'none';
+    document.getElementById('dailymotion-iframe').src = '';
+    document.getElementById('channel-info').style.display = 'none';
+    
+    // Stop progress tracking
+    stopDailymotionProgressTracking();
+    
+    activePlayer = null;
+}
+
+function dailymotionTogglePlayPause() {
+    // This would require Dailymotion API to implement properly
+    alert("Play/pause control not available for Dailymotion content");
+}
+
+function dailymotionToggleMute() {
+    // This would require Dailymotion API to implement properly
+    alert("Mute control not available for Dailymotion content");
+}
+
+function dailymotionToggleFullscreen() {
+    const dmContainer = document.getElementById('dailymotion-container');
+    if (!document.fullscreenElement) {
+        dmContainer.requestFullscreen().catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (activePlayer === 'jwplayer') {
+        switch(e.key) {
+            case ' ':
+            case 'k':
+                togglePlayPause();
+                e.preventDefault();
+                break;
+            case 'm':
+                player.setMute(!player.getMute());
+                e.preventDefault();
+                break;
+            case 'f':
+                toggleFullscreen();
+                e.preventDefault();
+                break;
+            case 'ArrowRight':
+                player.seek(player.getPosition() + SEEK_FORWARD_TIME);
+                showSeekFeedback(SEEK_FORWARD_TIME);
+                e.preventDefault();
+                break;
+            case 'ArrowLeft':
+                player.seek(Math.max(0, player.getPosition() - SEEK_BACKWARD_TIME));
+                showSeekFeedback(-SEEK_BACKWARD_TIME);
+                e.preventDefault();
+                break;
+            case 'n':
+                nextChannel();
+                e.preventDefault();
+                break;
+            case 'p':
+                previousChannel();
+                e.preventDefault();
+                break;
+        }
+    } else if (activePlayer === 'youtube') {
+        switch(e.key) {
+            case ' ':
+            case 'k':
+                iframeTogglePlayPause();
+                e.preventDefault();
+                break;
+            case 'm':
+                iframeToggleMute();
+                e.preventDefault();
+                break;
+            case 'f':
+                iframeToggleFullscreen();
+                e.preventDefault();
+                break;
+            case 'ArrowRight':
+                seekForward();
+                e.preventDefault();
+                break;
+            case 'ArrowLeft':
+                seekBackward();
+                e.preventDefault();
+                break;
+        }
+    } else if (activePlayer === 'dailymotion') {
+        switch(e.key) {
+            case ' ':
+            case 'k':
+                dailymotionTogglePlayPause();
+                e.preventDefault();
+                break;
+            case 'm':
+                dailymotionToggleMute();
+                e.preventDefault();
+                break;
+            case 'f':
+                dailymotionToggleFullscreen();
+                e.preventDefault();
+                break;
+        }
+    }
+});
+
+// Initialize the first channel
+updateChannelInfo();
+
+// JWPlayer event listeners
+player.on('ready', function() {
+    console.log('JWPlayer is ready');
+    hideLoading();
+});
+
+player.on('error', function() {
+    showError('Error loading this stream. Please try another one.');
+    hideLoading();
+});
+
+player.on('buffer', function() {
+    showLoading();
+});
+
+player.on('play', function() {
+    hideLoading();
+    hideError();
+    isPlaying = true;
+    document.querySelector('.player-controls .img-btn:nth-child(2) img').src = 'https://cdn-icons-png.flaticon.com/512/2088/2088576.png';
+});
+
+player.on('pause', function() {
+    isPlaying = false;
+    document.querySelector('.player-controls .img-btn:nth-child(2) img').src = 'https://cdn-icons-png.flaticon.com/512/2088/2088562.png';
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    if (activePlayer === 'jwplayer') {
+        player.resize('100%', '100%');
+    }
+});
+
+// Handle fullscreen change
+document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement) {
+        // Handle exiting fullscreen if needed
+    }
+});
+</script>
+
+
+
+</body>
+</html>
